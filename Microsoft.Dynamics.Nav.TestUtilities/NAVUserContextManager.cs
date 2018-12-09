@@ -21,39 +21,43 @@ namespace Microsoft.Dynamics.Nav.TestUtilities
         /// 
         /// </summary>
         /// <param name="navServerUrl">URL for NAV ClientService</param>
-        /// <param name="tenantId">Tenant</param>
-        /// <param name="companyName">Company</param>
+        /// <param name="defaultTenantId">Default Tenant Id</param>
+        /// <param name="defaultCompanyName">Company</param>
         /// <param name="authenticationScheme">Authentication Scheme</param>
         /// <param name="roleCenterId">Role Center to use for the users</param>
         /// <param name="defaultNAVUserName">Default User Name</param>
         /// <param name="defaultNAVPassword">Default Password</param>
-        public NAVUserContextManager(string navServerUrl, string tenantId, string companyName, int? roleCenterId, string defaultNAVUserName, string defaultNAVPassword)
-            : base(navServerUrl, tenantId, companyName, roleCenterId)
+        public NAVUserContextManager(string navServerUrl, string defaultTenantId, string defaultCompanyName, int? roleCenterId, string defaultNAVUserName, string defaultNAVPassword)
+            : base(navServerUrl, defaultTenantId, defaultCompanyName, roleCenterId)
         {
-            DefaultNAVUserName = defaultNAVUserName;
-            DefaultNAVPassword = defaultNAVPassword;
+            this.DefaultNAVUserName = defaultNAVUserName;
+            this.DefaultNAVPassword = defaultNAVPassword;
         }
 
         protected override UserContext CreateUserContext(TestContext testContext)
         {
-            var userName = GetUserName(testContext);
-            var userContext = new UserContext(TenantId, Company, AuthenticationScheme.UserNamePassword, userName, DefaultNAVPassword);
-            return userContext;
+            string tenantId;
+            string companyName;
+            string userName;
+            GetTenantAndUserName(testContext, out tenantId, out companyName, out userName);
+            return new UserContext(tenantId, companyName, AuthenticationScheme.UserNamePassword, userName, DefaultNAVPassword);
         }
 
-        protected override string GetUserName(TestContext testContext)
+        protected override void GetTenantAndUserName(TestContext testContext, out string tenantId, out string companyName, out string userName)
         {
             LoadTestUserContext loadTestUserContext = testContext.GetLoadTestUserContext();
+            tenantId = DefaultTenantId;
+            companyName = DefaultCompanyName;
+            userName = DefaultNAVUserName;
+
             if (loadTestUserContext != null)
             {
-                // add the load test user id as a suffix to the default user name 
-                return String.Format("{0}{1}", DefaultNAVUserName, loadTestUserContext.UserId);
+                // add the load test user id as a suffix to the default user name
+                userName = String.Format("{0}{1}", DefaultNAVUserName, loadTestUserContext.UserId);
+
+                // add the load test user id as a suffix to the default tenant name
+                // tenantId = String.Format("{0}{1}", DefaultTenantId, loadTestUserContext.UserId);
             }
-
-            // empty user name will use the default user name, this is the case when running as unit tests
-            return DefaultNAVUserName;
         }
-
-
     }
 }

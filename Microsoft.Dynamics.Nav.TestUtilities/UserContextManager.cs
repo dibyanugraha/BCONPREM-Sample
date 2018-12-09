@@ -16,23 +16,21 @@ namespace Microsoft.Dynamics.Nav.TestUtilities
     {
         private ConcurrentDictionary<int, UserContext> UserContextPool { get; set; }
         public string NAVServerUrl { get; private set; }
-        public string TenantId { get; private set; }
-        public string Company { get; private set; }
+        public string DefaultTenantId { get; private set; }
+        public string DefaultCompanyName { get; private set; }
         public int? RoleCenterId { get; private set; }
         /// <summary>
         /// 
         /// </summary>
         /// <param name="navServerUrl">URL for NAV ClientService</param>
-        /// <param name="tenantId">Tenant</param>
-        /// <param name="companyName">Company</param>
         /// <param name="roleCenterId">Role Center to use for the users</param>
-        public UserContextManager(string navServerUrl, string tenantId, string companyName, int? roleCenterId)
+        public UserContextManager(string navServerUrl, string defaultTenantId, string defaultCompanyName, int? roleCenterId)
         {
             this.UserContextPool = new ConcurrentDictionary<int, UserContext>();
-            NAVServerUrl = navServerUrl;
-            this.TenantId = tenantId;
-            this.Company = companyName;
-            RoleCenterId = roleCenterId;
+            this.NAVServerUrl = navServerUrl;
+            this.DefaultTenantId = defaultTenantId;
+            this.DefaultCompanyName = defaultCompanyName;
+            this.RoleCenterId = roleCenterId;
         }
 
         /// <summary>
@@ -79,7 +77,6 @@ namespace Microsoft.Dynamics.Nav.TestUtilities
         /// <returns></returns>
         public UserContext GetUserContext(TestContext testContext)
         {
-            string userName = GetUserName(testContext);
             UserContext userContext = CreateUserContext(testContext);
             int userId = GetTestUserId(testContext);
             if (this.UserContextPool.TryRemove(userId, out userContext))
@@ -94,7 +91,7 @@ namespace Microsoft.Dynamics.Nav.TestUtilities
         /// </summary>
         /// <param name="testContext">current test context</param>
         /// <returns></returns>
-        protected abstract string GetUserName(TestContext testContext);
+        protected abstract void GetTenantAndUserName(TestContext testContext, out string tenantId, out string companyName, out string userName);
 
         /// <summary>
         /// Create a new user context for the current virtual user
