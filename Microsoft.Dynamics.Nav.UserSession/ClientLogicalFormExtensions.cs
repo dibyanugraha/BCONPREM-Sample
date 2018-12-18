@@ -26,29 +26,29 @@ namespace Microsoft.Dynamics.Nav.UserSession
             return form.ContainedControls.OfType<TType>().First();
         }
 
-//        public static void ExecuteQuickFilter(this ClientLogicalForm form, string columnName, string value)
-//        {
-//            var filter = form.FindLogicalFormControl<ClientFilterLogicalControl>();
-//            form.Session.InvokeInteraction(new ExecuteFilterInteraction(filter)
-//            {
-//                QuickFilterColumnId = filter.QuickFilterColumns.First(columnDef => columnDef.Caption.Replace("&", "").Equals(columnName)).Id,
-//                QuickFilterValue = value
-//            });
-//
-//            if (filter.ValidationResults.Count > 0)
-//            {
-//                throw new ArgumentException("Could not execute filter.");
-//            }
-//        }
+        public static void ExecuteQuickFilter(this ClientLogicalForm form, string columnName, string value)
+        {
+            var filter = form.FindLogicalFormControl<ClientFilterLogicalControl>();
+            form.Session.InvokeInteraction(new FilterInteraction(filter) 
+            {
+              FilterColumnId = filter.FilterColumns.First(columnDef => columnDef.Caption.Replace("&", "").Equals(columnName)).Id,
+              FilterValue = value
+            });
 
-        /// <summary>
-        /// Determines whether [is cronus demo dialog] [the specified dialog].
-        /// </summary>
-        /// <param name="dialog">The dialog.</param>
-        /// <returns>
-        ///   <c>true</c> if [is cronus demo dialog] [the specified dialog]; otherwise, <c>false</c>.
-        /// </returns>
-        public static bool IsCronusDemoDialog(ClientLogicalForm dialog)
+            if (filter.ValidationResults.Count > 0)
+            {
+              throw new ArgumentException("Could not execute filter.");
+            }
+        }
+
+    /// <summary>
+    /// Determines whether [is cronus demo dialog] [the specified dialog].
+    /// </summary>
+    /// <param name="dialog">The dialog.</param>
+    /// <returns>
+    ///   <c>true</c> if [is cronus demo dialog] [the specified dialog]; otherwise, <c>false</c>.
+    /// </returns>
+    public static bool IsCronusDemoDialog(ClientLogicalForm dialog)
         {
             if (dialog.IsDialog)
             {
