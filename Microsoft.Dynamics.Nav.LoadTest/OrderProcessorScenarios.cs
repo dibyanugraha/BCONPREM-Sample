@@ -35,58 +35,75 @@ namespace Microsoft.Dynamics.Nav.LoadTest
 
         private UserContextManager CreateUserContextManager()
         {
-            if (UseWindowsAuthentication)
+            switch (Authentication)
             {
-                // Use the current windows user 
-                orderProcessorUserContextManager = new WindowsUserContextManager(
-                        NAVClientService,
+                case AuthenticationScheme.Windows:
+                    // Use the current windows user 
+                    orderProcessorUserContextManager = new WindowsUserContextManager(
+                        ClientServiceUrl,
                         null,
                         null,
                         OrderProcessorRoleCenterId);
-            }
-            else
-            {
-                // Use Username / Password authentication
-                orderProcessorUserContextManager = new NAVUserContextManager(
-                       NAVClientService,
-                       null,
-                       null,
-                       OrderProcessorRoleCenterId,
-                       NAVUserName,
-                       NAVPassword);
+                    break;
+                case AuthenticationScheme.UserNamePassword:
+                    // Use Username / Password authentication
+                    orderProcessorUserContextManager = new NAVUserContextManager(
+                        ClientServiceUrl,
+                        null,
+                        null,
+                        OrderProcessorRoleCenterId,
+                        Username,
+                        Password);
+                    break;
+                case AuthenticationScheme.AzureActiveDirectory:
+                    // Use Username / Password authentication
+                    orderProcessorUserContextManager = new AADUserContextManager(
+                        ClientServiceUrl,
+                        Settings.Default.Tenant,
+                        null,
+                        OrderProcessorRoleCenterId,
+                        Username,
+                        Password,
+                        Settings.Default.Authority,
+                        Settings.Default.Resource,
+                        Settings.Default.ClientId,
+                        Settings.Default.ClientSecret);
+                    break;
+                default:
+                    throw new Exception("Unknown authentication scheme");
             }
             return orderProcessorUserContextManager;
         }
 
-        public string NAVPassword
+        public string Password
         {
             get
             {
-                return Settings.Default.NAVUserPassword;
+                return Settings.Default.Password;
             }
         }
 
-        public string NAVUserName
+        public string Username
         {
             get
             {
-                return Settings.Default.NAVUserName;
+                return Settings.Default.UserName;
             }
         }
 
-        public string NAVClientService
+        public string ClientServiceUrl
         {
             get
             {
-                return Settings.Default.NAVClientService;
+                return Settings.Default.ClientServiceUrl;
             }
         }
 
-        public bool UseWindowsAuthentication
+        public AuthenticationScheme Authentication
         {
             get
             {
-                return Settings.Default.UseWindowsAuthentication;
+                return Settings.Default.Authentication;
             }
         }
 

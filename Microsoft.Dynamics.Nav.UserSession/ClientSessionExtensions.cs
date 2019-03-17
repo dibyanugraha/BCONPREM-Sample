@@ -5,6 +5,9 @@ using System.ServiceModel;
 using Microsoft.Dynamics.Framework.UI.Client;
 using Microsoft.Dynamics.Framework.UI.Client.Interactions;
 using System.Net;
+using Newtonsoft.Json;
+using System.Net.Http;
+using System.Collections.Generic;
 
 namespace Microsoft.Dynamics.Nav.UserSession
 {
@@ -200,14 +203,44 @@ namespace Microsoft.Dynamics.Nav.UserSession
         /// <param name="username">The username.</param>
         /// <param name="password">The password.</param>
         /// <returns>The initialize session.</returns>
-        public static ClientSession InitializeSession(string serviceAddress, string tenantId = null, string company = null, AuthenticationScheme? authentication = null, string username = null, string password = null)
+        public static ClientSession InitializeSession(string serviceAddress, string tenantId = null, string company = null, AuthenticationScheme? authentication = null, string username = null, string password = null, string authority = null, string resource = null, string clientId = null, string clientSecret = null)
         {
             if (string.IsNullOrWhiteSpace(serviceAddress))
             {
                 throw new ArgumentNullException("serviceAddress");
             }
 
-            if (!string.IsNullOrEmpty(tenantId))
+            if (serviceAddress.Equals("https://businesscentral.dynamics.com", StringComparison.InvariantCultureIgnoreCase))
+            {
+                if (string.IsNullOrEmpty(tenantId))
+                {
+                    throw new Exception("tenantId must be specified");
+                }
+                // using Business Central Online  - locate tenant
+                string deploymentUrl = string.Format("https://businesscentral.dynamics.com/{0}/deployment/url", tenantId);
+                var webClient = new System.Net.WebClient();
+                var data = webClient.DownloadString(deploymentUrl);
+                dynamic dyn = JsonConvert.DeserializeObject(data);
+                if (dyn.status != "Ready")
+                {
+                    throw new Exception(string.Format("Tenant {0} is not Ready ({1})", tenantId, dyn.status));
+                }
+                serviceAddress = dyn.data;
+                var qidx = serviceAddress.IndexOf("?");
+                if (qidx >= 0)
+                {
+                    serviceAddress = serviceAddress.Insert(qidx, "cs");
+                }
+                else
+                {
+                    if (!serviceAddress.EndsWith("/"))
+                    {
+                        serviceAddress += "/";
+                    }
+                    serviceAddress += "cs";
+                }
+            }
+            else if (!string.IsNullOrEmpty(tenantId))
             {
                 serviceAddress += "?tenant=" + tenantId;
             }
@@ -218,10 +251,37 @@ namespace Microsoft.Dynamics.Nav.UserSession
             }
 
             Uri addressUri = ServiceAddressProvider.ServiceAddress(new Uri(serviceAddress));
+
             ICredentials credentials = null;
-            if (authentication.GetValueOrDefault() == AuthenticationScheme.UserNamePassword)
+            switch (authentication)
             {
-                credentials = new NetworkCredential(username, password);
+                case AuthenticationScheme.UserNamePassword:
+                    credentials = new NetworkCredential(username, password);
+                    break;
+                case AuthenticationScheme.AzureActiveDirectory:
+                    using (var client = new HttpClient())
+                    {
+                        var result = client.PostAsync(new Uri(authority + "/oauth2/token"), new FormUrlEncodedContent(new[]
+                        {
+                            new KeyValuePair<string, string>("resource", resource),
+                            new KeyValuePair<string, string>("client_id", clientId),
+                            new KeyValuePair<string, string>("grant_type", "password"),
+                            new KeyValuePair<string, string>("username", username),
+                            new KeyValuePair<string, string>("password", password),
+                            new KeyValuePair<string, string>("scope", "openid"),
+                            new KeyValuePair<string, string>("client_secret", clientSecret),
+                        })).Result;
+
+                        var content = result.Content.ReadAsStringAsync().Result;
+                        var authResult = JsonConvert.DeserializeObject<OAuthResult>(content);
+                        credentials = new TokenCredential(authResult.Access_Token);
+                    }
+                    break;
+                case AuthenticationScheme.Windows:
+                    // Windows auth is supported
+                    break;
+                default:
+                    throw new Exception("Unsupported Authentication Scheme");
             }
 
             var jsonClient = new JsonHttpClient(addressUri, credentials, authentication.GetValueOrDefault());

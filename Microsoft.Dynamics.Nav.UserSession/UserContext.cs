@@ -9,13 +9,17 @@ namespace Microsoft.Dynamics.Nav.UserSession
 {
     public class UserContext
     {
-        public UserContext(string tenantId, string company, AuthenticationScheme authenticationScheme, string userName = null, string password = null)
+        public UserContext(string tenantId, string company, AuthenticationScheme authenticationScheme, string userName = null, string password = null, string authority = null, string resource = null, string clientId = null, string clientSecret = null)
         {
-            TenantId = tenantId;
-            Company = company;
-            AuthenticationScheme = authenticationScheme;
-            UserName = userName;
-            Password = password;
+            this.TenantId = tenantId;
+            this.Company = company;
+            this.AuthenticationScheme = authenticationScheme;
+            this.UserName = userName;
+            this.Password = password;
+            this.Authority = authority;
+            this.Resource = resource;
+            this.ClientId = clientId;
+            this.ClientSecret = clientSecret;
         }
 
         public string TenantId { get; private set; }
@@ -27,6 +31,11 @@ namespace Microsoft.Dynamics.Nav.UserSession
         public string UserName { get; private set; }
 
         public string Password { get; private set; }
+
+        public string Authority { get; private set; }
+        public string Resource { get; private set; }
+        public string ClientId { get; private set; }
+        public string ClientSecret { get; private set; }
 
         private ClientSession clientSession;
 
@@ -131,7 +140,7 @@ namespace Microsoft.Dynamics.Nav.UserSession
         public void InitializeSession(string serviceAddress)
         {
             this.clientSession = ClientSessionExtensions.InitializeSession(serviceAddress, this.TenantId, this.Company,
-                AuthenticationScheme, this.UserName, this.Password);
+                AuthenticationScheme, this.UserName, this.Password, this.Authority, this.Resource, this.ClientId, this.ClientSecret);
         }
 
         /// <summary>
