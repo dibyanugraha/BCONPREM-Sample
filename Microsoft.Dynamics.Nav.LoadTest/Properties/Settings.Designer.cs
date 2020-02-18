@@ -12,7 +12,7 @@ namespace Microsoft.Dynamics.Nav.LoadTest.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.9.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.4.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -25,17 +25,7 @@ namespace Microsoft.Dynamics.Nav.LoadTest.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.WebServiceUrl)]
-        [global::System.Configuration.DefaultSettingValueAttribute("http://mydev/nav/cs")]
-        public string ClientServiceUrl {
-            get {
-                return ((string)(this["ClientServiceUrl"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("admin")]
+        [global::System.Configuration.DefaultSettingValueAttribute("testing")]
         public string UserName {
             get {
                 return ((string)(this["UserName"]));
@@ -44,7 +34,7 @@ namespace Microsoft.Dynamics.Nav.LoadTest.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("P@ssword1")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Aries#12345")]
         public string Password {
             get {
                 return ((string)(this["Password"]));
@@ -102,6 +92,16 @@ namespace Microsoft.Dynamics.Nav.LoadTest.Properties {
         public string Tenant {
             get {
                 return ((string)(this["Tenant"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.WebServiceUrl)]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://localhost:15080/BC140_CU08/cs")]
+        public string ClientServiceUrl {
+            get {
+                return ((string)(this["ClientServiceUrl"]));
             }
         }
     }

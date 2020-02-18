@@ -2,14 +2,11 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Microsoft.Dynamics.Nav.LoadTest.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="ClientServiceUrl" Type="(Web Service URL)" Scope="Application">
-      <Value Profile="(Default)">http://mydev/nav/cs</Value>
-    </Setting>
     <Setting Name="UserName" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">admin</Value>
+      <Value Profile="(Default)">testing</Value>
     </Setting>
     <Setting Name="Password" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">P@ssword1</Value>
+      <Value Profile="(Default)">Aries#12345</Value>
     </Setting>
     <Setting Name="Authentication" Type="Microsoft.Dynamics.Framework.UI.Client.AuthenticationScheme" Scope="Application">
       <Value Profile="(Default)">UserNamePassword</Value>
@@ -28,6 +25,9 @@
     </Setting>
     <Setting Name="Tenant" Type="System.String" Scope="Application">
       <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="ClientServiceUrl" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://localhost:15080/BC140_CU08/cs</Value>
     </Setting>
   </Settings>
 </SettingsFile>
